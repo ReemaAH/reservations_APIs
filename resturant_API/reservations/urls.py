@@ -8,7 +8,7 @@ from .views import (
 
 urlpatterns = [
     path('',  ReservationApiListView.as_view()),
-    path('<int:starting_time>/',  ReservationApiListView.as_view()),
+    path('<str:customer_mobile>/',  ReservationApiListView.as_view()),
     path('time-slots/<int:number_of_seats>/', AvailableReservationsTimeSlotsView.as_view()),
     path('all/', ReservationsByFiltersListView.as_view()),
     path('tables', TableApiListView.as_view()),

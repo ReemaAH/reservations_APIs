@@ -160,6 +160,14 @@ class TableDetailApiView(AdminRoleMixin, APIView):
                 {"result": "Table does not exists"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
+    
+        # checks if there are no reservations for the requested table
+        if(Reservation.objects.filter(table__number=table.number).exists()):
+            return Response(
+            {"result": "can not delete a table has reservations"},
+            status=status.HTTP_400_BAD_REQUEST
+        )
+
         table.delete()
         return Response(
             {"result": "Table has been deleted"},
@@ -269,28 +277,24 @@ class ReservationApiListView(generics.ListAPIView):
                         status=status.HTTP_400_BAD_REQUEST)
 
 
-    def delete(self, request, starting_time, *args, **kwargs):
+    def delete(self, request, customer_mobile, *args, **kwargs):
         '''
-        Deletes the reservation with given starting_time if exists
+        Deletes the reservation with given customer_mobile if exists
         '''
        
-        if(starting_time):
-            starting_time = (int(starting_time))
-            if starting_time > 24 or starting_time < 1:
-               return Response(
-                {"result": "Reservation hour format is incorrect"}, 
+        if(customer_mobile is None):
+            return Response(
+                {"result": "customer mobile should be provided"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        starting_time = datetime.datetime.strptime(str(starting_time), '%H').time()
-
         reservation = Reservation.objects.filter(
             date=datetime.datetime.now().date(),
-            starting_time=starting_time)
+            customer__mobile_number=customer_mobile)
         
         if not reservation:
             return Response(
-                {"result": "Reservation with starting time of: " + str(starting_time) + " does not exists"}, 
+                {"result": "Reservation for cusotmet with mobile number: " + str(customer_mobile) + " does not exists"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         reservation.delete()
