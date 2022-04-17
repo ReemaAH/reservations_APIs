@@ -8,6 +8,9 @@ The idea of this project is to create a backend system that enables the restaura
 ### URLs
 - Locally: http://127.0.0.1:8000/
 
+### Postman collection link:
+https://go.postman.co/workspace/My-Workspace~e85051d8-fb36-4eee-8252-8d3d692f6f35/collection/13494285-abbe333a-a606-41ef-babb-8e01f89a08f2?action=share&creator=13494285
+
 
 ### To running the server locally you can do either a or b:
 
@@ -77,3 +80,5 @@ Please run the following commands:
 ``` coverage run manage.py test``` 
 ``` coverage report ``` 
 ``` coverage html ``` 
+
+
