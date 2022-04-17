@@ -20,8 +20,6 @@ from .serializers import (
 CACHE_TTL = settings.CACHE_TTL
 starting_woring_time = datetime.time(12,00,00)
 ending_working_time = datetime.time(23,59,00)
-print("starting_woring_time: " + str(starting_woring_time ))
-print("ending_working_time: " + str(ending_working_time) )
 max_number_of_seats = 12
 
 

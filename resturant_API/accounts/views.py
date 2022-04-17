@@ -30,6 +30,8 @@ class UserAPIView(AdminRoleMixin, RetrieveAPIView):
 
         if serializer.is_valid():
             serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response({
+                "result": "user created successfully", "data": serializer.validated_data['employee_number']},
+                status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
