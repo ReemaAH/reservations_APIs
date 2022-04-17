@@ -275,6 +275,15 @@ class ReservationApiListView(generics.ListAPIView):
         '''
         Deletes the reservation with given starting_time if exists
         '''
+       
+        if(starting_time):
+            starting_time = (int(starting_time))
+            if starting_time > 24 or starting_time < 1:
+               return Response(
+                {"result": "Reservation hour format is incorrect"}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         starting_time = datetime.datetime.strptime(str(starting_time), '%H').time()
 
         reservation = Reservation.objects.filter(
@@ -283,7 +292,7 @@ class ReservationApiListView(generics.ListAPIView):
         
         if not reservation:
             return Response(
-                {"result": "Reservation with starting time of: " + str(starting_time) + "does not exists"}, 
+                {"result": "Reservation with starting time of: " + str(starting_time) + " does not exists"}, 
                 status=status.HTTP_400_BAD_REQUEST
             )
         reservation.delete()
