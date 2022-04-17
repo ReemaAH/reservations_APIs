@@ -201,17 +201,30 @@ class ReservationApiListView(generics.ListAPIView):
         new_end_time = data['ending_time']
         table_number = data['table_number']
 
-        # 1. checks if the reservations is within the working hours
+        # 1. checks if the two times are equals to each other
+        if (new_start_time == new_end_time):
+            raise Exception(
+                "starting time can't be the same as ending time")
+        
+        # 2. checks if ending is smaller that ending time
+        if(new_end_time < new_start_time):
+            raise Exception(
+                "ending time can't be smaller than statring time")
+
+        # 3. checks if the reservations is within the working hours
         if (new_start_time < starting_woring_time or new_start_time > ending_working_time or
             new_end_time < starting_woring_time or new_end_time > ending_working_time):
             raise Exception(
                 "reservation should be with the working hours: " + str(starting_woring_time) + " - " + str(ending_working_time))
 
-        # 2. checking if there is no overlapping
+        # 4. checking if there is no overlapping
         if (Reservation.objects.filter(date=new_date).filter(
-            Q(table__number=table_number) & Q(starting_time__lte=new_start_time, ending_time__gte=new_start_time) | 
-            Q(starting_time__lte=new_end_time, ending_time__gte=new_end_time)).exists()):
-
+            Q(table__number=table_number) & Q(starting_time__lte=new_start_time) & Q(ending_time__gt=new_start_time) | 
+            Q(starting_time__lt=new_end_time) & Q(ending_time__gt=new_end_time)).exists()):
+            raise Exception('Sorry, this time slot is reserved, please pick a new time slot')
+        
+        if (Reservation.objects.filter(date=new_date).filter(
+            Q(table__number=table_number) & Q(starting_time__gte=new_start_time) & Q(ending_time__lte=new_end_time)).exists()):
             raise Exception('Sorry, this time slot is reserved, please pick a new time slot')
 
  
@@ -227,13 +240,20 @@ class ReservationApiListView(generics.ListAPIView):
             'customer_mobile': request.data.get('customer_mobile'),
             'table_number':  request.data.get('table_number')
         }
-
+   
 
         serializer = CreateReservationSerializer(data=data)
         if serializer.is_valid():
+            # get table, if table not exist an exception will be thrown 
             try:
-                # get table, if table not exist an exception will be thrown 
-                Table = Table.objecs.get(number=serializer.validated_data['table_number'])
+                Table.objects.get(number=serializer.validated_data['table_number'])
+            except Table.DoesNotExist:
+                return Response(
+                    {"result": "Table does not exist" },
+                    status=status.HTTP_400_BAD_REQUEST
+                    )
+                
+            try:
                 self.create_reservation_validation(serializer.validated_data)
 
             except Exception as e:
@@ -290,7 +310,7 @@ class AvailableReservationsTimeSlotsView(APIView):
             # exit the loop when reaching the max number of seats
             if number_of_seats > max_number_of_seats:
                 return Response(
-                    {"result": "sorry max number of seats is 12"},
+                    {"result": "sorry no suitable table for this number of seats"},
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
