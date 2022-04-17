@@ -17,7 +17,14 @@ https://go.postman.co/workspace/My-Workspace~e85051d8-fb36-4eee-8252-8d3d692f6f3
 ### a) by running services in docker-compose
 - make sure you installed docker or visit this link: https://docs.docker.com/get-docker/
 - make sure you installed docker-compose: https://docs.docker.com/compose/install/ 
+- login to dockerhub so you pull the images
 - run the following command to run docker-compose 
+``` docker-compose up -d ```
+* please note that, when running docker-compose up, django application may not recognize
+the docker db container, to solve that run the following
+
+``` docker-compose down```
+then again 
 ``` docker-compose up -d ```
 
 ### b) by installing dependencies 
@@ -80,5 +87,3 @@ Please run the following commands:
 ``` coverage run manage.py test``` 
 ``` coverage report ``` 
 ``` coverage html ``` 
-
-
